@@ -79,3 +79,16 @@ tape('emit the command error', function(t) {
 
   server.write('hello matteo')
 })
+
+tape('serve a multi word command', function(t) {
+  t.plan(1)
+
+  var server = bcksrv()
+
+  server.register('hello world', function(args, stream, cb) {
+    t.deepEqual(args, ['matteo'])
+    cb()
+  })
+
+  server.write('hello world matteo')
+})

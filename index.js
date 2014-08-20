@@ -16,14 +16,29 @@ function bcksrv() {
   return result
 
   function forward(line, enc, done) {
-    var chunks = line.toString().split(' ')
-      , command = chunks[0]
-      , rest = chunks.slice(1)
+    var chunks  = line.toString().split(' ')
+      , command = []
+      , func
+      , rest
 
-    if (commands[command]) {
-      commands[command](rest, outStream, function(err) {
+    func = chunks.reduce(function(acc, chunk) {
+      if (!acc)
+        return null
+
+      if (typeof acc === 'function')
+        return acc
+
+      command.push(chunk)
+
+      return acc[chunk]
+    }, commands)
+
+    rest = chunks.slice(command.length)
+
+    if (func) {
+      func(rest, outStream, function(err) {
         if (err) {
-          result.emit('commandError', command, rest, err)
+          result.emit('commandError', command.join(' '), rest, err)
           return outStream.write(err.toString())
         }
         done();
@@ -34,9 +49,23 @@ function bcksrv() {
   }
 
   function register(command, func) {
-    commands[command] = func
-  }
+    var chunks = command.split(' ')
+      , holder
 
+    holder = chunks.slice(0, chunks.length -1).reduce(function (acc, command) {
+      if (commands[command])
+        return commands[command]
+
+      var current = {}
+      commands[command] = current;
+
+      return current
+    }, commands)
+
+    holder[chunks[chunks.length -1 ]] = func
+
+    return result
+  }
 }
 
 module.exports = bcksrv

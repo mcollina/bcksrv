@@ -4,8 +4,13 @@
   "description": "Serve your commands like a pro",
   "main": "index.js",
   "scripts": {
-    "test": "tape test.js | faucet"
+    "test": "tape test.js | faucet",
+    "jshint": "jshint *.js"
   },
+  "pre-commit": [
+    "jshint",
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/mcollina/bcksrv.git"
@@ -24,6 +29,8 @@
   "homepage": "https://github.com/mcollina/bcksrv",
   "devDependencies": {
     "faucet": "0.0.1",
+    "jshint": "^2.5.4",
+    "pre-commit": "0.0.9",
     "tape": "^2.14.0"
   },
   "dependencies": {
