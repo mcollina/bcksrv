@@ -1,0 +1,35 @@
+{
+  "name": "bcksrv",
+  "version": "0.0.0",
+  "description": "Serve your commands like a pro",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test.js | faucet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcollina/bcksrv.git"
+  },
+  "keywords": [
+    "command",
+    "server",
+    "text",
+    "protocol"
+  ],
+  "author": "Matteo Collina <hello@matteocollina.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcollina/bcksrv/issues"
+  },
+  "homepage": "https://github.com/mcollina/bcksrv",
+  "devDependencies": {
+    "faucet": "0.0.1",
+    "tape": "^2.14.0"
+  },
+  "dependencies": {
+    "readable-stream": "^1.0.31",
+    "reduplexer": "0.0.7",
+    "split2": "^0.2.1",
+    "through2": "^0.6.1"
+  }
+}
