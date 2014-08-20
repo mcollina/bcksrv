@@ -1,3 +1,4 @@
+'use strict';
 
 var split       = require('split2')
   , through     = require('through2')
@@ -6,20 +7,54 @@ var split       = require('split2')
 
 function bcksrv() {
 
-  var inStream  = split().pipe(through.obj(forward))
-    , outStream = new PassThrough()
-    , result    = duplexer(inStream, outStream)
-    , commands  = {}
+  var commands  = {}
+    , srv       = {
+          stream: stream
+        , register: register
+      }
 
-  result.register = register
+  return srv
 
-  return result
+  function stream() {
+    var inStream  = split()
+      , outStream = new PassThrough()
+      , result    = duplexer(inStream, outStream)
+      , filter    = through.obj(forward)
+
+    inStream.pipe(filter)
+    filter.outStream = outStream
+    filter.result = result
+
+    return result
+  }
+
+  function register(command, func) {
+    var chunks = command.split(' ')
+      , holder
+
+    holder = chunks.slice(0, chunks.length -1).reduce(function (acc, command) {
+      if (acc[command])
+        return acc[command]
+
+      var current = {}
+      acc[command] = current;
+
+      return current
+    }, commands)
+
+    holder[chunks[chunks.length -1 ]] = func
+
+    return srv
+  }
 
   function forward(line, enc, done) {
+    /*jshint validthis:true */
     var chunks  = line.toString().split(' ')
       , command = []
       , func
       , rest
+      , outStream = this.outStream
+      , result = this.result
 
     func = chunks.reduce(function(acc, chunk) {
       if (!acc)
@@ -39,32 +74,13 @@ function bcksrv() {
       func(rest, outStream, function(err) {
         if (err) {
           result.emit('commandError', command.join(' '), rest, err)
-          return outStream.write(err.toString())
+          outStream.write(err.toString() + '\n')
         }
-        done();
+        done()
       })
     } else {
       outStream.write('no such command\n', done)
     }
-  }
-
-  function register(command, func) {
-    var chunks = command.split(' ')
-      , holder
-
-    holder = chunks.slice(0, chunks.length -1).reduce(function (acc, command) {
-      if (commands[command])
-        return commands[command]
-
-      var current = {}
-      commands[command] = current;
-
-      return current
-    }, commands)
-
-    holder[chunks[chunks.length -1 ]] = func
-
-    return result
   }
 }
 
