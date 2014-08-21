@@ -18,8 +18,11 @@ function bcksrv() {
   function stream() {
     var inStream  = split()
       , outStream = new PassThrough()
-      , result    = duplexer(inStream, outStream)
-      , filter    = through.obj(forward)
+      , result    = duplexer(inStream, outStream, { allowHalfOpen: false })
+      , filter    = through.obj(forward, function(cb) {
+          outStream.end()
+          cb();
+        })
 
     inStream.pipe(filter)
     filter.outStream = outStream

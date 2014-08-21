@@ -181,3 +181,30 @@ tape('recover after multiline', function(t) {
   stream.write('END\n')
   stream.write('buaaa\n')
 })
+
+tape('emits finish', function(t) {
+  t.plan(1)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  stream.on('finish', function() {
+    t.pass('finish event emitted')
+  })
+
+  stream.end()
+})
+
+tape('emits end', function(t) {
+  t.plan(1)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  stream.on('end', function() {
+    t.pass('end event emitted')
+  })
+
+  stream.end()
+  stream.resume();
+})
