@@ -28,9 +28,17 @@ function bcksrv() {
     return result
   }
 
-  function register(command, func) {
+  function register(command, opts, func) {
+    if (typeof opts === 'function') {
+      func = opts
+      opts = {}
+    }
+
     var chunks = command.split(' ')
       , holder
+
+    if (opts.multiline)
+      func.multiline = typeof opts.multiline === 'string' ? opts.multiline : 'END'
 
     holder = chunks.slice(0, chunks.length -1).reduce(function (acc, command) {
       if (acc[command])
@@ -49,6 +57,18 @@ function bcksrv() {
 
   function forward(line, enc, done) {
     /*jshint validthis:true */
+
+    if (this.multiline && line !== this.multilineEnd) {
+      this.multiline.push(line)
+      return done()
+    } else if (this.multiline && line === this.multilineEnd) {
+      this.multilineFunc(this.multiline.join('\n'), complete)
+      this.multiline = null
+      this.multilineFunc = null
+      this.multilineEnd = null
+      return
+    }
+
     var chunks  = line.toString().split(' ')
       , command = []
       , func
@@ -70,16 +90,23 @@ function bcksrv() {
 
     rest = chunks.slice(command.length)
 
-    if (func) {
-      func(rest, outStream, function(err) {
-        if (err) {
-          result.emit('commandError', command.join(' '), rest, err)
-          outStream.write(err.toString() + '\n')
-        }
-        done()
-      })
+    if (func && !func.multiline) {
+      func(rest, outStream, complete)
+    } else if (func && func.multiline) {
+      this.multilineFunc = func.bind(null, rest, outStream)
+      this.multiline = []
+      this.multilineEnd = func.multiline
+      done()
     } else {
       outStream.write('no such command\n', done)
+    }
+
+    function complete(err) {
+      if (err) {
+        result.emit('commandError', command.join(' '), rest, err)
+        outStream.write(err.toString() + '\n')
+      }
+      done()
     }
   }
 }

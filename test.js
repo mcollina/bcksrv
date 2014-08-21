@@ -118,3 +118,66 @@ tape('command after error', function(t) {
     t.pass('write callback called')
   })
 })
+
+tape('serve a multiline command', function(t) {
+  t.plan(2)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  server.register('hello', { multiline: 'END' }, function(args, stream, multiline, cb) {
+    t.deepEqual(args, ['matteo'])
+    t.equal(multiline, 'such a\nlong\nstring')
+    cb()
+  })
+
+  stream.write('hello matteo\n')
+  stream.write('such a\n')
+  stream.write('long\n')
+  stream.write('string\n')
+  stream.write('END\n')
+})
+
+tape('serve a multiline command with different char', function(t) {
+  t.plan(2)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  server.register('hello', { multiline: 'EOF' }, function(args, stream, multiline, cb) {
+    t.deepEqual(args, ['matteo'])
+    t.equal(multiline, 'such a\nlong\nstring')
+    cb()
+  })
+
+  stream.write('hello matteo\n')
+  stream.write('such a\n')
+  stream.write('long\n')
+  stream.write('string\n')
+  stream.write('EOF\n')
+})
+
+tape('recover after multiline', function(t) {
+  t.plan(3)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  server.register('hello', { multiline: 'END' }, function(args, stream, multiline, cb) {
+    t.deepEqual(args, ['matteo'])
+    t.equal(multiline, 'such a\nlong\nstring')
+    cb()
+  })
+
+  server.register('buaaa', function(args, stream, cb) {
+    t.deepEqual(args, [])
+    cb()
+  })
+
+  stream.write('hello matteo\n')
+  stream.write('such a\n')
+  stream.write('long\n')
+  stream.write('string\n')
+  stream.write('END\n')
+  stream.write('buaaa\n')
+})
