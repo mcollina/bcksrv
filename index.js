@@ -65,7 +65,7 @@ function bcksrv() {
       this.multiline.push(line)
       return done()
     } else if (this.multiline && line === this.multilineEnd) {
-      this.multilineFunc(this.multiline.join('\n'), complete)
+      this.multilineFunc(this.multiline.join('\n'), this.multilineComplete)
       this.multiline = null
       this.multilineFunc = null
       this.multilineEnd = null
@@ -99,6 +99,7 @@ function bcksrv() {
       this.multilineFunc = func.bind(null, rest, outStream)
       this.multiline = []
       this.multilineEnd = func.multiline
+      this.multilineComplete = complete;
       done()
     } else {
       outStream.write('no such command\n', done)

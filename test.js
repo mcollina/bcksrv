@@ -208,3 +208,27 @@ tape('emits end', function(t) {
   stream.end()
   stream.resume();
 })
+
+
+tape('emit the command error with multiline', function(t) {
+  t.plan(3)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  server.register('hello', { multiline: true }, function(args, stream, data, cb) {
+    cb(new Error('muahha'))
+  })
+
+  stream.on('commandError', function(command, args, err) {
+    t.equal(command, 'hello')
+    t.deepEqual(args, ['matteo'])
+    t.equal(err.toString(), 'Error: muahha')
+  })
+
+  stream.write('hello matteo\n')
+  stream.write('such a\n')
+  stream.write('long\n')
+  stream.write('string\n')
+  stream.write('END\n')
+})
