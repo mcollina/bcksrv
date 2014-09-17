@@ -1,6 +1,6 @@
 {
   "name": "bcksrv",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Serve your commands like a pro",
   "main": "index.js",
   "scripts": {
