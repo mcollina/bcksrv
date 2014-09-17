@@ -246,3 +246,17 @@ tape('serve a multi word command with escaping', function(t) {
 
   stream.end('hello "my world"')
 })
+
+tape('support args escaping', function(t) {
+  t.plan(1)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  server.register('hello', function(args, stream, cb) {
+    t.deepEqual(args, ['my world'])
+    cb()
+  })
+
+  stream.end('hello "my world"')
+})
