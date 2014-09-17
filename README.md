@@ -5,6 +5,9 @@ bcksrv
 __bcksrv__ is a tiny module to build command servers easily,
 securely and error-safe.
 
+This module support the same escaping and quoting of shell commands.
+It is implemented through the [shell-quote](http://npm.im/shell-quote) module.
+
 Example
 -------
 
