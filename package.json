@@ -31,7 +31,7 @@
     "faucet": "0.0.1",
     "jshint": "^2.5.4",
     "pre-commit": "0.0.9",
-    "tape": "^2.14.0"
+    "tape": "^3.0.0"
   },
   "dependencies": {
     "readable-stream": "^1.0.31",
