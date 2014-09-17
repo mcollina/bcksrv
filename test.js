@@ -18,7 +18,7 @@ tape('serve a basic command', function(t) {
   })
 })
 
-tape('serve a basic sending back some data', function(t) {
+tape('serve a basic command sending back some data', function(t) {
   t.plan(1)
 
   var server = bcksrv()
@@ -231,4 +231,18 @@ tape('emit the command error with multiline', function(t) {
   stream.write('long\n')
   stream.write('string\n')
   stream.write('END\n')
+})
+
+tape('serve a multi word command with escaping', function(t) {
+  t.plan(1)
+
+  var server = bcksrv()
+    , stream = server.stream()
+
+  server.register('hello "my world"', function(args, stream, cb) {
+    t.deepEqual(args, [])
+    cb()
+  })
+
+  stream.end('hello "my world"')
 })

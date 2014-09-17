@@ -36,6 +36,7 @@
   "dependencies": {
     "readable-stream": "^1.0.31",
     "reduplexer": "0.0.7",
+    "shell-quote": "^1.4.2",
     "split2": "^0.2.1",
     "through2": "^0.6.1"
   }

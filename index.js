@@ -4,6 +4,7 @@ var split       = require('split2')
   , through     = require('through2')
   , duplexer    = require('reduplexer')
   , PassThrough = require('readable-stream').PassThrough
+  , toChunks    = require('shell-quote').parse
 
 function bcksrv() {
 
@@ -37,7 +38,7 @@ function bcksrv() {
       opts = {}
     }
 
-    var chunks = command.split(' ')
+    var chunks = toChunks(command)
       , holder
 
     if (opts.multiline)
@@ -72,7 +73,7 @@ function bcksrv() {
       return
     }
 
-    var chunks  = line.toString().split(' ')
+    var chunks  = toChunks(line)
       , command = []
       , func
       , rest
